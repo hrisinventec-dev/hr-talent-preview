@@ -86,6 +86,14 @@
 
   /* TABLE */
   .table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+  .pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--bg3);border-top:1px solid var(--border);flex-wrap:wrap;gap:8px;}
+  .pagination-info{font-size:12px;color:var(--text3);}
+  .pagination-btns{display:flex;align-items:center;gap:4px;}
+  .page-btn{padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);cursor:pointer;font-size:12px;color:var(--text2);min-width:32px;text-align:center;}
+  .page-btn:hover{background:var(--purple-dim);border-color:var(--purple);color:var(--purple);}
+  .page-btn.active{background:var(--purple);border-color:var(--purple);color:white;font-weight:600;}
+  .page-btn:disabled{opacity:0.35;cursor:default;}
+  .page-size-sel{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg2);color:var(--text2);}
   .search-bar{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--bg3);}
   .search-input{flex:1;min-width:160px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);padding:7px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;}
   .search-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-dim);}
@@ -216,6 +224,7 @@
 
   /* TABLE SCROLL */
   .table-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .table-scroll-wrap::after{content:'↕ 滾輪可左右捲動';display:block;text-align:center;font-size:11px;color:var(--text3);padding:4px;background:var(--bg3);border-top:1px solid var(--border);}
   .table-scroll-wrap table{min-width:1300px;}
   .table-scroll-wrap th:first-child,.table-scroll-wrap td:first-child{position:sticky;left:0;z-index:2;box-shadow:2px 0 5px rgba(0,0,0,.06);}
   .table-scroll-wrap th:first-child{background:var(--bg3);z-index:3;}
@@ -314,18 +323,44 @@
       </div>
       <div class="table-wrap">
         <div class="search-bar">
-          <input class="search-input" placeholder="搜尋姓名、公司、職位..." id="talent-search" oninput="renderTalents()">
-          <select class="filter-select" id="company-filter" onchange="renderTalents()">
-            <option value="">所有公司</option>
-            <option>Google</option><option>Meta</option><option>Amazon</option><option>LINE</option><option>Shopee</option>
-          </select>
-          <select class="filter-select" id="status-filter" onchange="renderTalents()">
-            <option value="">所有狀態</option>
-            <option>待接觸</option><option>已聯絡</option><option>有意願</option><option>面試中</option><option>已Offer</option><option>冷藏</option>
-          </select>
+          <input class="search-input" placeholder="搜尋姓名、公司、職位..." id="talent-search" oninput="_currentPage=1;renderTalents()">
           <button class="btn" onclick="exportExcel()" style="white-space:nowrap;flex-shrink:0">
             📥 匯出 Excel
           </button>
+        </div>
+        <!-- 篩選列（所有 tab 共用的公司+狀態，找人才 tab 額外顯示更多篩選）-->
+        <div id="recruit-filters" style="padding:8px 16px;border-bottom:1px solid var(--border);background:var(--bg3);display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span style="font-size:12px;color:var(--text3);white-space:nowrap">篩選：</span>
+          <select class="filter-select" id="company-filter" onchange="_currentPage=1;renderTalents()" style="font-size:12px">
+            <option value="">所有公司</option>
+          </select>
+          <select class="filter-select" id="status-filter" onchange="_currentPage=1;renderTalents()" style="font-size:12px">
+            <option value="">所有狀態</option>
+            <option>待接觸</option><option>已聯絡</option><option>有意願</option><option>面試中</option><option>已Offer</option><option>冷藏</option>
+          </select>
+          <!-- 找人才專屬篩選（tab 切換時控制顯示） -->
+          <span id="rr-filter-extra" style="display:none;display:contents">
+            <select class="filter-select" id="rr-jobgroup-filter" onchange="_currentPage=1;updateRrJobFamilyFilter();renderTalents()" style="font-size:12px">
+              <option value="">所有 Job Group</option>
+            </select>
+            <select class="filter-select" id="rr-jobfamily-filter" onchange="_currentPage=1;updateRrJobFunctionFilter();renderTalents()" style="font-size:12px">
+              <option value="">所有 Job Family</option>
+            </select>
+            <select class="filter-select" id="rr-jobfunction-filter" onchange="_currentPage=1;renderTalents()" style="font-size:12px">
+              <option value="">所有 Job Function</option>
+            </select>
+            <select class="filter-select" id="rr-client-filter" onchange="_currentPage=1;renderTalents()" style="font-size:12px">
+              <option value="">所有客戶/代工廠</option>
+            </select>
+            <select class="filter-select" id="rr-product-filter" onchange="_currentPage=1;renderTalents()" style="font-size:12px">
+              <option value="">所有產品</option>
+            </select>
+            <select class="filter-select" id="rr-reply-filter" onchange="_currentPage=1;renderTalents()" style="font-size:12px">
+              <option value="">所有接觸進度</option>
+              <option>待接觸</option><option>已接觸</option><option>有轉職意願</option><option>無轉職意願</option>
+            </select>
+            <button class="btn" onclick="clearRrFilters()" style="font-size:12px;padding:5px 10px">清除</button>
+          </span>
         </div>
         <div class="table-scroll-wrap">
         <table>
@@ -336,6 +371,8 @@
           <tbody id="talent-tbody"></tbody>
         </table>
         </div>
+        <!-- Pagination -->
+        <div class="pagination" id="talent-pagination"></div>
       </div>
     </div>
 
@@ -961,6 +998,9 @@ const KCOL_COLORS={'待接觸':'#5c5c70','已聯絡':'#5b9cf6','有意願':'#3dd
 const AVATARS=['#9b8cff','#3dd6c8','#5b9cf6','#f5a623','#ff6b6b','#4ade80'];
 
 let talentTab='all', kanbanTab='all', iTab='all';
+let _currentPage = 1;
+let _pageSize = 50;
+const PAGE_SIZE_OPTIONS = [25, 50, 100];
 
 
 // ── TYPE TOGGLE (新增表單) ────────────────────────────────────────
@@ -2086,12 +2126,160 @@ function selectAllRd(val) {
 }
 
 window.toggleRdPanel = toggleRdPanel;
+
+// ── 滑鼠滾輪橫向捲動表格 ──
+document.addEventListener('DOMContentLoaded', () => {
+  const wrap = document.querySelector('.table-scroll-wrap');
+  if (!wrap) return;
+  wrap.addEventListener('wheel', (e) => {
+    if (wrap.scrollWidth > wrap.clientWidth) {
+      e.preventDefault();
+      wrap.scrollLeft += e.deltaY * 1.5;
+    }
+  }, { passive: false });
+});
 window.saveRdDefinition = saveRdDefinition;
 window.selectAllRd = selectAllRd;
 window.syncFamilyCheck = syncFamilyCheck;
 window.syncFnCheck = syncFnCheck;
 
 // ── TALENTS TABLE ────────────────────────────────────────────────
+function renderPagination(total, totalPages) {
+  const el = document.getElementById('talent-pagination');
+  if (!el) return;
+  if (total === 0) { el.innerHTML = ''; return; }
+
+  const start = (_currentPage - 1) * _pageSize + 1;
+  const end   = Math.min(_currentPage * _pageSize, total);
+
+  // Page buttons: show max 7 buttons with ellipsis
+  let pageNums = [];
+  if (totalPages <= 7) {
+    pageNums = Array.from({length: totalPages}, (_,i) => i+1);
+  } else {
+    pageNums = [1];
+    if (_currentPage > 3) pageNums.push('...');
+    for (let p = Math.max(2, _currentPage-1); p <= Math.min(totalPages-1, _currentPage+1); p++) pageNums.push(p);
+    if (_currentPage < totalPages - 2) pageNums.push('...');
+    pageNums.push(totalPages);
+  }
+
+  const pageSizeOpts = PAGE_SIZE_OPTIONS.map(s =>
+    `<option value="${s}" ${s===_pageSize?'selected':''}>${s} 筆/頁</option>`).join('');
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px">
+      <select class="page-size-sel" onchange="changePageSize(this.value)">${pageSizeOpts}</select>
+      <span class="pagination-info">共 ${total} 筆，第 ${start}–${end} 筆</span>
+    </div>
+    <div class="pagination-btns">
+      <button class="page-btn" onclick="goPage(1)" ${_currentPage===1?'disabled':''}>«</button>
+      <button class="page-btn" onclick="goPage(${_currentPage-1})" ${_currentPage===1?'disabled':''}>‹</button>
+      ${pageNums.map(p => p==='...'
+        ? `<span style="padding:4px 6px;color:var(--text3)">…</span>`
+        : `<button class="page-btn ${p===_currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`
+      ).join('')}
+      <button class="page-btn" onclick="goPage(${_currentPage+1})" ${_currentPage===totalPages?'disabled':''}>›</button>
+      <button class="page-btn" onclick="goPage(${totalPages})" ${_currentPage===totalPages?'disabled':''}>»</button>
+    </div>`;
+}
+
+function goPage(p) {
+  _currentPage = Math.max(1, p);
+  renderTalents();
+  document.getElementById('talent-tbody')?.closest('.table-wrap')?.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function changePageSize(val) {
+  _pageSize = parseInt(val);
+  _currentPage = 1;
+  renderTalents();
+}
+
+window.goPage = goPage;
+
+function getLatestRrRecord(tid) {
+  const rrs = (recruitRecords[tid]||[]).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if (rrs.length) return rrs[0];
+  // Fallback: use talent main data for imported talents with no recruitRecords
+  const t = talents.find(x => x.id === tid);
+  return t ? { jobGroup: t.jobGroup, jobFamily: t.jobFamily, jobFunction: t.jobFunction,
+                client: t.client, product: t.product, reply: t.reply } : null;
+}
+
+function updateRrFilterOptions() {
+  // Collect unique values from recruitRecords AND talent main data (for imported talents)
+  const rrTalents = talents.filter(t => (t.types||[]).includes('recruit'));
+  const allRrs = Object.values(recruitRecords).flat();
+
+  const uniq = (arr) => [...new Set(arr.filter(Boolean))].sort();
+
+  // Merge from both recruitRecords and talent main data
+  const groups  = uniq([...allRrs.map(r=>r.jobGroup),  ...rrTalents.map(t=>t.jobGroup)]);
+  const clients  = uniq([...allRrs.map(r=>r.client),    ...rrTalents.map(t=>t.client)]);
+  const products = uniq([...allRrs.map(r=>r.product),   ...rrTalents.map(t=>t.product)]);
+
+  const sel = (id, opts, placeholder) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const cur = el.value;
+    el.innerHTML = `<option value="">${placeholder}</option>` +
+      opts.map(v=>`<option value="${v}" ${v===cur?'selected':''}>${v}</option>`).join('');
+  };
+
+  sel('rr-jobgroup-filter',   groups,   '所有 Job Group');
+  sel('rr-client-filter',     clients,  '所有客戶/代工廠');
+  sel('rr-product-filter',    products, '所有產品');
+  updateRrJobFamilyFilter();
+}
+
+function updateRrJobFamilyFilter() {
+  const group = document.getElementById('rr-jobgroup-filter')?.value||'';
+  const rrTalents = talents.filter(t => (t.types||[]).includes('recruit'));
+  const allRrs = Object.values(recruitRecords).flat().filter(r => !group || r.jobGroup === group);
+  const talentFamilies = rrTalents.filter(t => !group || t.jobGroup === group).map(t=>t.jobFamily);
+  const families = [...new Set([...allRrs.map(r=>r.jobFamily), ...talentFamilies].filter(Boolean))].sort();
+  const el = document.getElementById('rr-jobfamily-filter');
+  if (!el) return;
+  const cur = el.value;
+  el.innerHTML = '<option value="">所有 Job Family</option>' +
+    families.map(v=>`<option value="${v}" ${v===cur?'selected':''}>${v}</option>`).join('');
+  updateRrJobFunctionFilter();
+}
+
+function updateRrJobFunctionFilter() {
+  const group  = document.getElementById('rr-jobgroup-filter')?.value||'';
+  const family = document.getElementById('rr-jobfamily-filter')?.value||'';
+  const rrTalents = talents.filter(t => (t.types||[]).includes('recruit'));
+  const allRrs = Object.values(recruitRecords).flat()
+    .filter(r => (!group || r.jobGroup===group) && (!family || r.jobFamily===family));
+  const talentFns = rrTalents
+    .filter(t => (!group || t.jobGroup===group) && (!family || t.jobFamily===family))
+    .map(t=>t.jobFunction);
+  const fns = [...new Set([...allRrs.map(r=>r.jobFunction), ...talentFns].filter(Boolean))].sort();
+  const el = document.getElementById('rr-jobfunction-filter');
+  if (!el) return;
+  const cur = el.value;
+  el.innerHTML = '<option value="">所有 Job Function</option>' +
+    fns.map(v=>`<option value="${v}" ${v===cur?'selected':''}>${v}</option>`).join('');
+}
+
+function clearRrFilters() {
+  ['company-filter','status-filter',
+   'rr-jobgroup-filter','rr-jobfamily-filter','rr-jobfunction-filter',
+   'rr-client-filter','rr-product-filter','rr-reply-filter'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  _currentPage = 1;
+  renderTalents();
+}
+
+window.updateRrJobFamilyFilter = updateRrJobFamilyFilter;
+window.updateRrJobFunctionFilter = updateRrJobFunctionFilter;
+window.clearRrFilters = clearRrFilters;
+window.changePageSize = changePageSize;
+
 function updateCompanyFilter() {
   const sel = document.getElementById('company-filter');
   if (!sel) return;
@@ -2120,6 +2308,10 @@ function renderTalents(){
 
   const isIvTab = talentTab === 'interview';
   const isRecruitTab = talentTab === 'recruit';
+  // Show recruit-extra filters only on 找人才 tab
+  const rrExtra = document.getElementById('rr-filter-extra');
+  if (rrExtra) rrExtra.style.display = isRecruitTab ? 'contents' : 'none';
+  if (isRecruitTab) updateRrFilterOptions();
 
   const q=document.getElementById('talent-search')?.value.toLowerCase()||'';
   const co=document.getElementById('company-filter')?.value||'';
@@ -2147,6 +2339,27 @@ function renderTalents(){
     const allDates = [...rrDates, ...ivDates].sort().reverse();
     const talent = talents.find(x => x.id === tid);
     return allDates[0] || (talent && (talent.ivDate||talent.updated||talent.created)) || '';
+  }
+  // Apply recruit-specific filters
+  if (isRecruitTab) {
+    const fg  = document.getElementById('rr-jobgroup-filter')?.value||'';
+    const ff  = document.getElementById('rr-jobfamily-filter')?.value||'';
+    const ffn = document.getElementById('rr-jobfunction-filter')?.value||'';
+    const fc  = document.getElementById('rr-client-filter')?.value||'';
+    const fp  = document.getElementById('rr-product-filter')?.value||'';
+    const fr  = document.getElementById('rr-reply-filter')?.value||'';
+    if (fg||ff||ffn||fc||fp||fr) {
+      data = data.filter(t => {
+        const lr = getLatestRrRecord(t.id);
+        if (fg  && (lr?.jobGroup   ||'') !== fg)  return false;
+        if (ff  && (lr?.jobFamily  ||'') !== ff)  return false;
+        if (ffn && (lr?.jobFunction||'') !== ffn) return false;
+        if (fc  && (lr?.client     ||'') !== fc)  return false;
+        if (fp  && (lr?.product    ||'') !== fp)  return false;
+        if (fr  && (lr?.reply      ||'') !== fr)  return false;
+        return true;
+      });
+    }
   }
   data = data.sort((a,b) => getLatestDateStr(b.id).localeCompare(getLatestDateStr(a.id)));
 
@@ -2176,7 +2389,15 @@ function renderTalents(){
     <th>接觸進度</th><th>面試階段</th><th>月薪</th><th>年薪</th><th>電子郵件</th><th>日期</th><th></th>
   </tr>`;
 
-  document.getElementById('talent-tbody').innerHTML=data.map((t,i)=>{
+  // ── Pagination ──
+  const totalCount = data.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / _pageSize));
+  if (_currentPage > totalPages) _currentPage = 1;
+  const pageStart = (_currentPage - 1) * _pageSize;
+  const pageData  = data.slice(pageStart, pageStart + _pageSize);
+  renderPagination(totalCount, totalPages);
+
+  document.getElementById('talent-tbody').innerHTML=pageData.map((t,i)=>{
 
     // ── 即時查詢最新紀錄，不依賴 talent 快取欄位 ──
     function getLatestRecord(tid) {
