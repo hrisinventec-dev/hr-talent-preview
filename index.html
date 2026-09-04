@@ -2840,10 +2840,16 @@ function objToFsFields(obj) {
 
 // Firebase REST operations
 const fbGet = async (col) => {
-  const res = await fetch(`${FB_BASE}/${col}?key=${FB_API_KEY}&pageSize=300`);
-  if (!res.ok) throw new Error(`GET ${col} failed: ${res.status}`);
-  const data = await res.json();
-  return (data.documents||[]).map(fsDocToObj);
+  let allDocs = [], pageToken = null;
+  do {
+    const url = `${FB_BASE}/${col}?key=${FB_API_KEY}&pageSize=300${pageToken ? '&pageToken=' + pageToken : ''}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`GET ${col} failed: ${res.status}`);
+    const data = await res.json();
+    if (data.documents) allDocs = allDocs.concat(data.documents.map(fsDocToObj));
+    pageToken = data.nextPageToken || null;
+  } while (pageToken);
+  return allDocs;
 };
 
 const fbAdd = async (col, obj) => {
@@ -5063,10 +5069,13 @@ async function confirmImport() {
   showLoading(`批次匯入 ${validRows.length} 筆人才...`);
 
   let success = 0, fail = 0;
+  // Calculate starting ID once before the loop to avoid collision
+  let nextId = talents.length ? Math.max(...talents.map(t=>Number(t.id)||0)) + 1 : 1;
+
   for (const row of validRows) {
     try {
       const source = row.linkedin || row.source || '';
-      const newId = talents.length ? Math.max(...talents.map(t=>t.id||0))+1 : 1;
+      const newId = nextId++; // increment after each use
       const types = _importType === 'both' ? ['recruit','interview'] :
                     _importType === 'interview' ? ['interview'] : ['recruit'];
       // 找人才欄位 (recruit)
