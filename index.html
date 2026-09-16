@@ -483,6 +483,9 @@
     <!-- ── 找人才欄位 ── -->
     <div id="section-recruit" style="display:none">
       <div class="section-divider">🔍 找人才資料</div>
+        <div class="form-row"><label>訪談 HR</label>
+          <select id="r-ivhr"><option value="">請選擇</option></select>
+        </div>
       <div class="form-grid">
         <div class="form-row"><label>公司</label>
           <select id="new-company"><option value="">請選擇</option></select>
@@ -2380,7 +2383,7 @@ function renderTalents(){
     <th>年齡</th><th>專業工作年資</th><th>Job Group</th><th>Job Family</th><th>Job Function</th>
     <th>職稱</th><th>職等</th><th>月薪</th><th>年薪</th><th>日期</th><th></th>
   </tr>` : isRecruitTab ? `<tr>
-    <th>人才</th><th>類型</th><th>公司</th><th>Job Group</th><th>Job Family</th><th>Job Function</th>
+    <th>人才</th><th>類型</th><th>公司</th><th>訪談 HR</th><th>Job Group</th><th>Job Family</th><th>Job Function</th>
     <th>層級</th><th>職稱</th><th>客戶/代工廠</th><th>產品</th>
     <th>接觸進度</th><th>面試階段</th><th>電子郵件</th><th>日期</th><th></th>
   </tr>` : `<tr>
@@ -2406,8 +2409,8 @@ function renderTalents(){
         company: r.company, jobGroup: r.jobGroup, jobFamily: r.jobFamily, jobFunction: r.jobFunction,
         title: r.jobtitle, level: r.level, client: r.client, product: r.product,
         source: r.source, email: r.email, mobile: r.mobile,
-        reply: r.reply, status: r.stage,
-        salary: null, annual: null, grade: null, yrs: null, ivHr: null, age: null,
+        reply: r.reply, status: r.stage, ivHr: r.ivHr || '',
+        salary: null, annual: null, grade: null, yrs: null, age: null,
       }));
       const ivList = (interviews[tid]||[]).map(r => ({
         _src:'iv', date: r.date||r.createdAt||'',
@@ -2460,6 +2463,7 @@ function renderTalents(){
         ${nameCell}
         <td><div style="display:flex;gap:4px;flex-wrap:wrap">${typeTags(t.types)}</div></td>
         <td>${D(lr?.company||t.company)}</td>
+        <td>${D(lr?.ivHr||t.ivHr)}</td>
         <td>${D(lr?.jobGroup||t.jobGroup)}</td><td>${D(lr?.jobFamily||t.jobFamily)}</td><td>${D(lr?.jobFunction||t.jobFunction)}</td>
         <td>${D(lr?.level||t.level)}</td>
         <td>${D(lr?.title||t.title)}</td>
@@ -2767,6 +2771,8 @@ function openTalentDetail(id){
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
           <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">日期</label>
             <input id="rri-date-${id}" type="date" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"></div>
+          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">訪談 HR</label>
+            <select id="rri-ivhr-${id}" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"><option value="">請選擇</option></select></div>
           <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">公司</label>
             <select id="rri-company-${id}" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"><option value="">請選擇</option></select></div>
           <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">工作屬性1 (Job Group)</label>
@@ -3803,6 +3809,7 @@ async function saveRecruitRecord() {
     jobGroup: getJobVal('rr','jobgroup'),
     jobFamily: getJobVal('rr','jobfamily'),
     jobFunction: getJobVal('rr','jobfunction'),
+    ivHr: document.getElementById('rr-ivhr').value,
     level: document.getElementById('rr-level').value,
     jobtitle: document.getElementById('rr-jobtitle').value,
     client: document.getElementById('rr-client').value,
@@ -3877,6 +3884,7 @@ function editRecruitRecord(talentId, idx, docId) {
   closeModal('talent-detail');
   const setVal = (id,val) => { const el=document.getElementById(id); if(el&&val!==undefined&&val!==null) el.value=val; };
   setVal('rr-date', rr.date);
+  setVal('rr-ivhr', rr.ivHr);
   setVal('rr-company', rr.company);
   setJobVal('rr','jobgroup', rr.jobGroup);
   // Directly populate rr-jobfamily and rr-jobfunction in sequence
@@ -3975,7 +3983,7 @@ async function deleteRecruitRecord(talentId, idx, docId) {
 }
 
 function resetRecruitRecordModal() {
-  ['rr-date','rr-company','rr-jobgroup','rr-jobfamily','rr-jobfunction','rr-level','rr-jobtitle','rr-client',
+  ['rr-date','rr-ivhr','rr-company','rr-jobgroup','rr-jobfamily','rr-jobfunction','rr-level','rr-jobtitle','rr-client',
    'rr-product','rr-source','rr-email','rr-mobile','rr-resume','rr-remark'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
@@ -4248,7 +4256,7 @@ function applyDropdownOptions() {
     if (fieldId === 'iv-jobgroup') ids.push('ivr-jobgroup', 'r-jobgroup', 'rr-jobgroup');
     if (fieldId === 'iv-jobfamily') ids.push('ivr-jobfamily', 'r-jobfamily', 'rr-jobfamily');
     // Also apply iv-hr options to ivr-hr
-    if (fieldId === 'iv-hr') ids.push('ivr-hr');
+    if (fieldId === 'iv-hr') ids.push('ivr-hr', 'r-ivhr', 'rr-ivhr');
     // Also apply iv-industry to ivr-industry
     if (fieldId === 'iv-industry') ids.push('ivr-industry');
     // Also apply iv-identity to ivr-identity
@@ -4671,6 +4679,7 @@ async function updateTalentFromForm(id) {
     title: isRecruit?(document.getElementById('r-jobtitle').value||''):(document.getElementById('iv-jobtitle').value||''),
     status: isRecruit?document.getElementById('r-stage').value:t.status,
     reply: isRecruit?document.getElementById('r-reply').value:'',
+    ivHr: isRecruit?(document.getElementById('r-ivhr')?.value||''):'',
     source: isRecruit?document.getElementById('r-source').value:'',
     email: isRecruit?document.getElementById('r-email').value:'',
     mobile: isRecruit?document.getElementById('r-mobile').value:'',
