@@ -2727,23 +2727,33 @@ function openTalentDetail(id){
       ${rrList.length ? rrList.map((rr,idx)=>`
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;position:relative;overflow:hidden">
           <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--purple)"></div>
-          <div style="padding:12px 16px;cursor:pointer;user-select:none" onclick="toggleIvDetail('rr-${id}-${idx}',this)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <!-- Header - clickable -->
+          <div style="padding:14px 16px;cursor:pointer;user-select:none" onclick="toggleIvDetail('rr-${id}-${idx}',this)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 ${rr.stage?`<span class="tag tag-${STATUS_COLORS[rr.stage]||'gray'}">${rr.stage}</span>`:''}
                 ${rr.reply?`<span style="font-size:11px;color:var(--text3);background:var(--bg3);padding:2px 7px;border-radius:10px">${rr.reply}</span>`:''}
+                ${rr.ivHr?`<span style="font-size:11px;color:var(--purple);background:var(--purple-dim);padding:2px 7px;border-radius:10px">${rr.ivHr}</span>`:''}
               </div>
               <div style="display:flex;align-items:center;gap:8px">
                 <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">${rr.date||''}</span>
-                <span id="arr-rr-${id}-${idx}" style="font-size:11px;color:var(--purple);background:var(--purple-dim);padding:2px 8px;border-radius:10px">▼ 展開</span>
+                <span id="arr-rr-${id}-${idx}" style="font-size:11px;color:var(--purple);background:var(--purple-dim);padding:2px 8px;border-radius:10px;transition:all .2s">▼ 展開</span>
               </div>
             </div>
-            ${rr.remark?`<div style="font-size:13px;color:var(--text2)">${rr.remark}</div>`:''}
+            ${rr.remark?`<div style="font-size:13px;color:var(--text2);line-height:1.6">${rr.remark}</div>`:'<div style="font-size:13px;color:var(--text3)">—</div>'}
+            ${(rr.company||rr.jobtitle||rr.level)?`
+            <div style="display:flex;gap:14px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);flex-wrap:wrap">
+              ${rr.company?`<span style="font-size:11px"><span style="color:var(--text3)">公司：</span>${rr.company}</span>`:''}
+              ${rr.jobtitle?`<span style="font-size:11px"><span style="color:var(--text3)">職稱：</span>${rr.jobtitle}</span>`:''}
+              ${rr.level?`<span style="font-size:11px"><span style="color:var(--text3)">層級：</span>${rr.level}</span>`:''}
+            </div>`:''}
           </div>
+          <!-- Expandable detail -->
           <div id="rr-${id}-${idx}" style="display:none;padding:12px 16px 16px;border-top:1px solid var(--border);background:var(--bg3)">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
               ${[
-                ['公司',rr.company],['工作屬性1 (Job Group)',rr.jobGroup],['工作屬性2 (Job Family)',rr.jobFamily],['工作屬性3 (Job Function)',rr.jobFunction],
+                ['公司',rr.company],['訪談 HR',rr.ivHr],
+                ['工作屬性1 (Job Group)',rr.jobGroup],['工作屬性2 (Job Family)',rr.jobFamily],['工作屬性3 (Job Function)',rr.jobFunction],
                 ['層級',rr.level],['職稱',rr.jobtitle],
                 ['客戶/代工廠',rr.client],['產品',rr.product],
                 ['Source',rr.source],['電子郵件',rr.email],
@@ -3370,15 +3380,17 @@ async function addTalent(){
     data._docId = docRef.id;
     talents.unshift(data);
 
-    // 如果是找人才，自動把填寫的資料存為第一筆找人才紀錄
+    // 如果是找人才，自動把填寫的資料存為第一筆找人才紀錄（初次建檔）
     if(isRecruit){
       const rrData = {
         talentId: data.id,
+        type: '初次建檔',
         date: today(),
-        channel: '—',
+        ivHr: data.ivHr || '',
         company: data.company || '',
         jobGroup: data.jobGroup || '',
         jobFamily: data.jobFamily || '',
+        jobFunction: data.jobFunction || '',
         level: data.level || '',
         jobtitle: data.title || '',
         client: data.client || '',
@@ -3707,6 +3719,20 @@ function toggleInlineRrForm(talentId) {
       }
     }
     document.getElementById('rri-date-' + talentId).value = today();
+
+    // 填充訪談 HR 下拉選項（從 iv-hr 選單管理）
+    const ivhrSel = document.getElementById('rri-ivhr-' + talentId);
+    if (ivhrSel) {
+      const srcSel = document.getElementById('iv-hr') || document.getElementById('ivr-hr');
+      if (srcSel) {
+        const cur = ivhrSel.value;
+        ivhrSel.innerHTML = '<option value="">請選擇</option>' +
+          Array.from(srcSel.options).slice(1).map(o =>
+            `<option value="${o.value}" ${o.value===cur?'selected':''}>${o.text}</option>`
+          ).join('');
+      }
+    }
+
     // Scroll form into view
     setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
   } else {
@@ -3726,8 +3752,10 @@ async function saveInlineRecruitRecord(talentId) {
   const data = {
     talentId,
     date: g('rri-date') || today(),
+    ivHr: g('rri-ivhr'),
     company: g('rri-company'),
     jobGroup: jg, jobFamily: jf,
+    jobFunction: g('rri-jobfunction'),
     level: g('rri-level'),
     jobtitle: g('rri-jobtitle'),
     client: g('rri-client'),
@@ -5410,6 +5438,36 @@ async function confirmImport() {
         ivData._docId = ivRef.id;
         if (!interviews[newId]) interviews[newId] = [];
         interviews[newId].unshift(ivData);
+      }
+
+      // 如果是找人才，同時建立第一筆找人才紀錄（初次建檔）
+      if (isRr) {
+        const rrData = {
+          talentId: newId,
+          date: row.date || today(),
+          type: '初次建檔',
+          ivHr:        row.hr          || '',
+          company:     row.company     || '',
+          jobGroup:    row.jobGroup    || '',
+          jobFamily:   row.jobFamily   || '',
+          jobFunction: row.jobFunction || '',
+          level:       row.level       || '',
+          jobtitle:    row.title       || '',
+          client:      row.client      || '',
+          product:     row.product     || '',
+          source:      source,
+          email:       row.email       || '',
+          mobile:      row.mobile      || '',
+          resume:      row.resume      || '',
+          stage:       row.stage       || '待接觸',
+          reply:       row.reply       || '',
+          remark:      row.remark      || '',
+          createdAt:   today(),
+        };
+        const rrRef = await fbAdd('recruitRecords', rrData);
+        rrData._docId = rrRef.id;
+        if (!recruitRecords[newId]) recruitRecords[newId] = [];
+        recruitRecords[newId].unshift(rrData);
       }
 
       success++;
