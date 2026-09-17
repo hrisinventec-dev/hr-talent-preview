@@ -483,34 +483,34 @@
     <!-- ── 找人才欄位 ── -->
     <div id="section-recruit" style="display:none">
       <div class="section-divider">🔍 找人才資料</div>
-        <div class="form-row"><label>訪談 HR</label>
+        <div class="form-row"><label>訪談 HR <span style="color:var(--coral)">*</span></label>
           <select id="r-ivhr"><option value="">請選擇</option></select>
         </div>
       <div class="form-grid">
-        <div class="form-row"><label>公司</label>
+        <div class="form-row"><label>公司 <span style="color:var(--coral)">*</span></label>
           <select id="new-company"><option value="">請選擇</option></select>
         </div>
-        <div class="form-row"><label>姓名</label><input id="r-name" placeholder="王小明"></div>
+        <div class="form-row"><label>姓名 <span style="color:var(--coral)">*</span></label><input id="r-name" placeholder="王小明"></div>
       </div>
       <div class="form-grid">
-        <div class="form-row"><label>工作屬性1 (Job Group)</label><select id="r-jobgroup" onchange="updateJobFamily('r-jobgroup','r-jobfamily','r-jobfunction')"><option value="">請選擇</option></select></div>
-        <div class="form-row"><label>工作屬性2 (Job Family)</label><select id="r-jobfamily" onchange="updateJobFunction('r-jobfamily','r-jobfunction')"><option value="">請選擇</option></select></div>
-        <div class="form-row"><label>工作屬性3 (Job Function)</label><select id="r-jobfunction" onchange=""><option value="">請選擇</option></select></div>
-        <div class="form-row"><label>層級</label><input id="r-level" placeholder="L5 / Senior..."></div>
+        <div class="form-row"><label>工作屬性1 (Job Group) <span style="color:var(--coral)">*</span></label><select id="r-jobgroup" onchange="updateJobFamily('r-jobgroup','r-jobfamily','r-jobfunction')"><option value="">請選擇</option></select></div>
+        <div class="form-row"><label>工作屬性2 (Job Family) <span style="color:var(--coral)">*</span></label><select id="r-jobfamily" onchange="updateJobFunction('r-jobfamily','r-jobfunction')"><option value="">請選擇</option></select></div>
+        <div class="form-row"><label>工作屬性3 (Job Function) <span style="color:var(--coral)">*</span></label><select id="r-jobfunction" onchange=""><option value="">請選擇</option></select></div>
+        <div class="form-row"><label>層級 <span style="color:var(--coral)">*</span></label><input id="r-level" placeholder="L5 / Senior..."></div>
       </div>
       <div class="form-grid">
-        <div class="form-row"><label>職稱</label><input id="r-jobtitle" placeholder="Software Engineer"></div>
+        <div class="form-row"><label>職稱 <span style="color:var(--coral)">*</span></label><input id="r-jobtitle" placeholder="Software Engineer"></div>
         <div class="form-row"><label>客戶/代工廠</label><input id="r-client" placeholder="Apple / NVIDIA..."></div>
       </div>
       <div class="form-grid">
         <div class="form-row"><label>產品</label><input id="r-product" placeholder="NB / Server..."></div>
-        <div class="form-row"><label>Source（來源／連結）</label>
+        <div class="form-row"><label>Source（來源／連結） <span style="color:var(--coral)">*</span></label>
           <input id="r-source" placeholder="LinkedIn網址 / 內部推薦 / 社群...">
         </div>
       </div>
       <div class="form-grid">
-        <div class="form-row"><label>電子郵件</label><input id="r-email" type="email" placeholder="name@company.com"></div>
-        <div class="form-row"><label>手機號碼</label><input id="r-mobile" placeholder="09xx-xxx-xxx"></div>
+        <div class="form-row"><label>電子郵件 <span style="color:var(--coral)">*（擇一）</span></label><input id="r-email" type="email" placeholder="name@company.com"></div>
+        <div class="form-row"><label>手機號碼 <span style="color:var(--coral)">*（擇一）</span></label><input id="r-mobile" placeholder="09xx-xxx-xxx"></div>
       </div>
       <div class="form-grid">
         <div class="form-row"><label>面試階段</label>
@@ -527,7 +527,7 @@
             <option>未報到</option>
           </select>
         </div>
-        <div class="form-row"><label>接觸進度</label>
+        <div class="form-row"><label>接觸進度 <span style="color:var(--coral)">*</span></label>
           <select id="r-reply">
             <option value="">請選擇</option>
             <option>已接觸</option>
@@ -550,7 +550,7 @@
         </div>
         <div style="font-size:11px;color:var(--text3);margin-top:4px">上傳後會轉為 Base64 暫存，建議改用 Google Drive 連結</div>
       </div>
-      <div class="form-row"><label>Remark（備註）</label><textarea id="r-remark" placeholder="補充說明..."></textarea></div>
+      <div class="form-row"><label>Remark（備註） <span style="color:var(--coral)">*</span></label><textarea id="r-remark" placeholder="補充說明..."></textarea></div>
     </div>
 
     <!-- ── 訪談人才欄位 ── -->
@@ -928,27 +928,30 @@
   <div class="modal" style="width:620px">
     <button class="modal-close" onclick="closeModal('add-recruit-record');resetRecruitRecordModal()">✕</button>
     <div class="modal-title" id="recruit-record-modal-title">新增找人才紀錄</div>
-    <div class="form-row"><label>日期</label><input id="rr-date" type="date"></div>
     <div class="form-grid">
-      <div class="form-row"><label>公司</label><select id="rr-company"><option value="">請選擇</option></select></div>
-      <div class="form-row"><label>工作屬性1 (Job Group)</label><select id="rr-jobgroup" onchange="updateJobFamily('rr-jobgroup','rr-jobfamily','rr-jobfunction')"><option value="">請選擇</option></select></div>
-      <div class="form-row"><label>工作屬性2 (Job Family)</label><select id="rr-jobfamily" onchange="updateJobFunction('rr-jobfamily','rr-jobfunction')"><option value="">請選擇</option></select></div>
-      <div class="form-row"><label>工作屬性3 (Job Function)</label><select id="rr-jobfunction"><option value="">請選擇</option></select></div>
+      <div class="form-row"><label>日期</label><input id="rr-date" type="date"></div>
+      <div class="form-row"><label>訪談 HR <span style="color:var(--coral)">*</span></label><select id="rr-ivhr"><option value="">請選擇</option></select></div>
     </div>
     <div class="form-grid">
-      <div class="form-row"><label>層級</label><input id="rr-level" placeholder="L5 / Senior..."></div>
-      <div class="form-row"><label>職稱</label><input id="rr-jobtitle" placeholder="Software Engineer"></div>
+      <div class="form-row"><label>公司 <span style="color:var(--coral)">*</span></label><select id="rr-company"><option value="">請選擇</option></select></div>
+      <div class="form-row"><label>工作屬性1 (Job Group) <span style="color:var(--coral)">*</span></label><select id="rr-jobgroup" onchange="updateJobFamily('rr-jobgroup','rr-jobfamily','rr-jobfunction')"><option value="">請選擇</option></select></div>
+      <div class="form-row"><label>工作屬性2 (Job Family) <span style="color:var(--coral)">*</span></label><select id="rr-jobfamily" onchange="updateJobFunction('rr-jobfamily','rr-jobfunction')"><option value="">請選擇</option></select></div>
+      <div class="form-row"><label>工作屬性3 (Job Function) <span style="color:var(--coral)">*</span></label><select id="rr-jobfunction"><option value="">請選擇</option></select></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label>層級 <span style="color:var(--coral)">*</span></label><input id="rr-level" placeholder="L5 / Senior..."></div>
+      <div class="form-row"><label>職稱 <span style="color:var(--coral)">*</span></label><input id="rr-jobtitle" placeholder="Software Engineer"></div>
     </div>
     <div class="form-grid">
       <div class="form-row"><label>客戶/代工廠</label><input id="rr-client" placeholder="Apple / NVIDIA..."></div>
       <div class="form-row"><label>產品</label><input id="rr-product" placeholder="NB / Server..."></div>
     </div>
     <div class="form-grid">
-      <div class="form-row"><label>Source（來源／連結）</label><input id="rr-source" placeholder="LinkedIn網址 / 內部推薦..."></div>
-      <div class="form-row"><label>電子郵件</label><input id="rr-email" type="email" placeholder="name@company.com"></div>
+      <div class="form-row"><label>Source（來源／連結） <span style="color:var(--coral)">*</span></label><input id="rr-source" placeholder="LinkedIn網址 / 內部推薦..."></div>
+      <div class="form-row"><label>電子郵件 <span style="color:var(--coral)">*</span>（擇一）</label><input id="rr-email" type="email" placeholder="name@company.com"></div>
     </div>
     <div class="form-grid">
-      <div class="form-row"><label>手機號碼</label><input id="rr-mobile" placeholder="09xx-xxx-xxx"></div>
+      <div class="form-row"><label>手機號碼 <span style="color:var(--coral)">*</span>（擇一）</label><input id="rr-mobile" placeholder="09xx-xxx-xxx"></div>
     <div class="form-row">
       <label>Resume（履歷）</label>
       <div style="display:flex;gap:8px;align-items:center">
@@ -971,14 +974,14 @@
           <option>待報到</option><option>未錄取</option><option>未報到</option>
         </select>
       </div>
-      <div class="form-row"><label>接觸進度</label>
+      <div class="form-row"><label>接觸進度 <span style="color:var(--coral)">*</span></label>
         <select id="rr-reply">
           <option value="">請選擇</option>
           <option>已接觸</option><option>待聯繫</option><option>有轉職意願</option><option>無轉職意願</option>
         </select>
       </div>
     </div>
-    <div class="form-row"><label>Remark（備註）</label><textarea id="rr-remark" placeholder="補充說明..." style="min-height:80px"></textarea></div>
+    <div class="form-row"><label>Remark（備註） <span style="color:var(--coral)">*</span></label><textarea id="rr-remark" placeholder="補充說明..." style="min-height:80px"></textarea></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('add-recruit-record');resetRecruitRecordModal()">取消</button>
       <button class="btn btn-primary" id="rr-save-btn" onclick="saveRecruitRecord()">儲存紀錄</button>
@@ -2731,6 +2734,7 @@ function openTalentDetail(id){
           <div style="padding:14px 16px;cursor:pointer;user-select:none" onclick="toggleIvDetail('rr-${id}-${idx}',this)">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                ${rr.type?`<span style="font-size:12px;font-weight:700;color:var(--purple)">${rr.type}</span>`:''}
                 ${rr.stage?`<span class="tag tag-${STATUS_COLORS[rr.stage]||'gray'}">${rr.stage}</span>`:''}
                 ${rr.reply?`<span style="font-size:11px;color:var(--text3);background:var(--bg3);padding:2px 7px;border-radius:10px">${rr.reply}</span>`:''}
                 ${rr.ivHr?`<span style="font-size:11px;color:var(--purple);background:var(--purple-dim);padding:2px 7px;border-radius:10px">${rr.ivHr}</span>`:''}
@@ -2781,29 +2785,29 @@ function openTalentDetail(id){
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
           <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">日期</label>
             <input id="rri-date-${id}" type="date" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">訪談 HR</label>
+          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">訪談 HR <span style="color:var(--coral)">*</span></label>
             <select id="rri-ivhr-${id}" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"><option value="">請選擇</option></select></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">公司</label>
+          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">公司 <span style="color:var(--coral)">*</span></label>
             <select id="rri-company-${id}" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"><option value="">請選擇</option></select></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">工作屬性1 (Job Group)</label>
+          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">工作屬性1 (Job Group) <span style="color:var(--coral)">*</span></label>
             <select id="rri-jobgroup-${id}" onchange="updateJobFamily('rri-jobgroup-${id}','rri-jobfamily-${id}')" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"><option value="">請選擇</option></select></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">工作屬性2 (Job Family)</label>
+          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">工作屬性2 (Job Family) <span style="color:var(--coral)">*</span></label>
             <select id="rri-jobfamily-${id}" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"><option value="">請選擇</option></select></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">工作屬性3 (Job Function)</label>
+          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">工作屬性3 (Job Function) <span style="color:var(--coral)">*</span></label>
             <select id="rri-jobfunction-${id}" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"><option value="">請選擇</option></select></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">層級</label>
+          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">層級 <span style="color:var(--coral)">*</span></label>
             <input id="rri-level-${id}" placeholder="L5 / Senior..." style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">職稱</label>
+          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">職稱 <span style="color:var(--coral)">*</span></label>
             <input id="rri-jobtitle-${id}" placeholder="Software Engineer" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"></div>
           <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">客戶/代工廠</label>
             <input id="rri-client-${id}" placeholder="Apple / NVIDIA..." style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"></div>
           <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">產品</label>
             <input id="rri-product-${id}" placeholder="NB / Server..." style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Source（來源／連結）</label>
+          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Source（來源／連結） <span style="color:var(--coral)">*</span></label>
             <input id="rri-source-${id}" placeholder="LinkedIn網址 / 內部推薦..." style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">電子郵件</label>
+          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">電子郵件 <span style="color:var(--coral)">*</span>（擇一）</label>
             <input id="rri-email-${id}" type="email" placeholder="name@company.com" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">手機號碼</label>
+          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">手機號碼 <span style="color:var(--coral)">*</span>（擇一）</label>
             <input id="rri-mobile-${id}" placeholder="09xx-xxx-xxx" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"></div>
           <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Resume（履歷連結）</label>
             <input id="rri-resume-${id}" placeholder="Google Drive / LinkedIn 連結..." style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)"></div>
@@ -2814,13 +2818,13 @@ function openTalentDetail(id){
               <option>主管評估中</option><option>人選考慮中</option><option>婉拒口頭Offer</option>
               <option>待報到</option><option>未錄取</option><option>未報到</option>
             </select></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">接觸進度</label>
+          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">接觸進度 <span style="color:var(--coral)">*</span></label>
             <select id="rri-reply-${id}" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text)">
               <option value="">請選擇</option>
               <option>已接觸</option><option>待聯繫</option><option>有轉職意願</option><option>無轉職意願</option>
             </select></div>
         </div>
-        <div style="margin-bottom:12px"><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Remark（備註）</label>
+        <div style="margin-bottom:12px"><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Remark（備註） <span style="color:var(--coral)">*</span></label>
           <textarea id="rri-remark-${id}" placeholder="補充說明..." style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;background:var(--bg2);color:var(--text);min-height:70px;resize:vertical"></textarea></div>
         <div style="display:flex;justify-content:flex-end;gap:8px">
           <button class="btn" style="font-size:12px" onclick="cancelInlineRrForm(${id})">取消</button>
@@ -3308,6 +3312,36 @@ async function addTalent(){
   const isInterview=typeState.interview;
   const name=(isRecruit?document.getElementById('r-name').value:document.getElementById('iv-name').value).trim();
   const company=(isRecruit?document.getElementById('new-company').value:document.getElementById('iv-company').value).trim();
+  // Validate required fields for recruit type
+  if(isRecruit){
+    const required = [
+      ['r-ivhr',    '訪談 HR'],
+      ['new-company','公司'],
+      ['r-name',    '姓名'],
+      ['r-jobtitle','職稱'],
+      ['r-level',   '層級'],
+      ['r-source',  'Source（來源/連結）'],
+      ['r-remark',  'Remark（備註）'],
+    ];
+    for(const [id, label] of required){
+      const el = document.getElementById(id);
+      if(!el || !el.value.trim()){ alert(`請填寫必填欄位：${label}`); el?.focus(); return; }
+    }
+    // Job Group 必填
+    if(!getJobVal('r','jobgroup')){ alert('請填寫必填欄位：工作屬性1 (Job Group)'); document.getElementById('r-jobgroup')?.focus(); return; }
+    // Job Family 必填
+    if(!getJobVal('r','jobfamily')){ alert('請填寫必填欄位：工作屬性2 (Job Family)'); document.getElementById('r-jobfamily')?.focus(); return; }
+    // Job Function 必填
+    if(!getJobVal('r','jobfunction')){ alert('請填寫必填欄位：工作屬性3 (Job Function)'); document.getElementById('r-jobfunction')?.focus(); return; }
+    // 接觸進度 必填
+    const replyEl = document.getElementById('r-reply');
+    if(!replyEl || !replyEl.value.trim()){ alert('請填寫必填欄位：接觸進度'); replyEl?.focus(); return; }
+    // 電子郵件或手機號碼 擇一必填
+    const email  = document.getElementById('r-email')?.value.trim();
+    const mobile = document.getElementById('r-mobile')?.value.trim();
+    if(!email && !mobile){ alert('電子郵件或手機號碼，請至少填寫一項'); document.getElementById('r-email')?.focus(); return; }
+  }
+
   // Validate required fields for interview type
   if(isInterview){
     const required = [
@@ -3749,6 +3783,27 @@ async function saveInlineRecruitRecord(talentId) {
   const g = (id) => { const el = document.getElementById(id + '-' + talentId); return el ? el.value : ''; };
   const jg = g('rri-jobgroup'); const jf = g('rri-jobfamily');
   const jgNote = ''; const jfNote = '';
+
+  // ── 必填欄位驗證 ──
+  const inlineRequired = [
+    ['rri-ivhr',    '訪談 HR'],
+    ['rri-company', '公司'],
+    ['rri-jobtitle','職稱'],
+    ['rri-level',   '層級'],
+    ['rri-source',  'Source（來源/連結）'],
+    ['rri-remark',  'Remark（備註）'],
+  ];
+  for(const [fid, label] of inlineRequired){
+    const val = g(fid);
+    if(!val.trim()){ alert(`請填寫必填欄位：${label}`); document.getElementById(fid+'-'+talentId)?.focus(); return; }
+  }
+  if(!jg){ alert('請填寫必填欄位：工作屬性1 (Job Group)'); document.getElementById('rri-jobgroup-'+talentId)?.focus(); return; }
+  if(!jf){ alert('請填寫必填欄位：工作屬性2 (Job Family)'); document.getElementById('rri-jobfamily-'+talentId)?.focus(); return; }
+  if(!g('rri-jobfunction')){ alert('請填寫必填欄位：工作屬性3 (Job Function)'); document.getElementById('rri-jobfunction-'+talentId)?.focus(); return; }
+  if(!g('rri-reply')){ alert('請填寫必填欄位：接觸進度'); document.getElementById('rri-reply-'+talentId)?.focus(); return; }
+  const rriEmail = g('rri-email'); const rriMobile = g('rri-mobile');
+  if(!rriEmail.trim() && !rriMobile.trim()){ alert('電子郵件或手機號碼，請至少填寫一項'); document.getElementById('rri-email-'+talentId)?.focus(); return; }
+
   const data = {
     talentId,
     date: g('rri-date') || today(),
@@ -3829,6 +3884,29 @@ function openRecruitRecordModal(talentId) {
 
 async function saveRecruitRecord() {
   if(!_rrEditTalentId) return;
+
+  // ── 必填欄位驗證 ──
+  const rrRequired = [
+    ['rr-ivhr',    '訪談 HR'],
+    ['rr-company', '公司'],
+    ['rr-jobtitle','職稱'],
+    ['rr-level',   '層級'],
+    ['rr-source',  'Source（來源/連結）'],
+    ['rr-remark',  'Remark（備註）'],
+  ];
+  for(const [id, label] of rrRequired){
+    const el = document.getElementById(id);
+    if(!el || !el.value.trim()){ alert(`請填寫必填欄位：${label}`); el?.focus(); return; }
+  }
+  if(!getJobVal('rr','jobgroup'))  { alert('請填寫必填欄位：工作屬性1 (Job Group)');  document.getElementById('rr-jobgroup')?.focus();  return; }
+  if(!getJobVal('rr','jobfamily')) { alert('請填寫必填欄位：工作屬性2 (Job Family)'); document.getElementById('rr-jobfamily')?.focus(); return; }
+  if(!getJobVal('rr','jobfunction')){ alert('請填寫必填欄位：工作屬性3 (Job Function)'); document.getElementById('rr-jobfunction')?.focus(); return; }
+  const rrReply = document.getElementById('rr-reply')?.value.trim();
+  if(!rrReply){ alert('請填寫必填欄位：接觸進度'); document.getElementById('rr-reply')?.focus(); return; }
+  const rrEmail  = document.getElementById('rr-email')?.value.trim();
+  const rrMobile = document.getElementById('rr-mobile')?.value.trim();
+  if(!rrEmail && !rrMobile){ alert('電子郵件或手機號碼，請至少填寫一項'); document.getElementById('rr-email')?.focus(); return; }
+
   const data = {
     talentId: _rrEditTalentId,
     date: document.getElementById('rr-date').value || today(),
