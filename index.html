@@ -4985,15 +4985,21 @@ function exportExcel(){
   const wb = XLSX.utils.book_new();
 
   // ── Sheet 1：找人才 ──
-  const recruitHeaders = ['姓名','公司','工作屬性1(Job Group)','工作屬性2(Job Family)','工作屬性3(Job Function)','層級','職稱','客戶/代工廠','產品',
-    'Source','電子郵件','手機號碼','面試階段','接觸進度','Resume','備註','日期'];
-  const recruitRows = recruitTalents.map(t=>[
-    t.name||'',t.company||'',t.jobGroup||'',t.jobFamily||'',t.jobFunction||'',t.level||'',t.title||'',
-    t.client||'',t.product||'',t.source||'',t.email||'',t.mobile||'',
-    t.status||'',t.reply||'',
-    t.resume&&t.resume.startsWith('data:')?'(已上傳檔案)':t.resume||'',
-    t.remark||'',t.updated||''
-  ]);
+  const recruitHeaders = ['姓名','公司','訪談 HR','工作屬性1(Job Group)','工作屬性2(Job Family)','工作屬性3(Job Function)',
+    '層級','職稱','客戶/代工廠','產品','Source','電子郵件','手機號碼','面試階段','接觸進度','Remark（備註）','日期'];
+  const recruitRows = recruitTalents.map(t=>{
+    const rrSorted = (recruitRecords[t.id]||[]).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    const rr = rrSorted[0] || {};
+    return [
+      t.name||'', rr.company||t.company||'', rr.ivHr||t.ivHr||'',
+      rr.jobGroup||t.jobGroup||'', rr.jobFamily||t.jobFamily||'', rr.jobFunction||t.jobFunction||'',
+      rr.level||t.level||'', rr.jobtitle||t.title||'',
+      rr.client||t.client||'', rr.product||t.product||'',
+      rr.source||t.source||'', rr.email||t.email||'', rr.mobile||t.mobile||'',
+      rr.stage||t.status||'', rr.reply||t.reply||'',
+      rr.remark||t.remark||'', rr.date||t.updated||''
+    ];
+  });
   const ws1 = XLSX.utils.aoa_to_sheet([recruitHeaders,...recruitRows]);
   ws1['!cols'] = recruitHeaders.map(()=>({wch:18}));
   recruitHeaders.forEach((_,c)=>{
@@ -5001,6 +5007,34 @@ function exportExcel(){
     if(ws1[cell]) ws1[cell].s={fill:{fgColor:{rgb:'E8EAF6'}},font:{bold:true}};
   });
   XLSX.utils.book_append_sheet(wb, ws1, '找人才');
+
+  // ── Sheet 找人才紀錄：每筆 recruitRecords 各一行 ──
+  const rrRecordHeaders = ['姓名','訪談 HR','日期','公司',
+    '工作屬性1(Job Group)','工作屬性2(Job Family)','工作屬性3(Job Function)',
+    '層級','職稱','客戶/代工廠','產品','Source','電子郵件','手機號碼',
+    '面試階段','接觸進度','Remark（備註）','紀錄類型'];
+  const rrRecordRows = [];
+  const recruitIds = new Set(recruitTalents.map(t=>t.id));
+  Object.entries(recruitRecords).forEach(([tid, rrList]) => {
+    if (!recruitIds.has(Number(tid))) return;
+    const talent = talents.find(t => t.id === Number(tid));
+    rrList.forEach(rr => {
+      rrRecordRows.push([
+        talent?.name||'', rr.ivHr||'', rr.date||'', rr.company||'',
+        rr.jobGroup||'', rr.jobFamily||'', rr.jobFunction||'',
+        rr.level||'', rr.jobtitle||'', rr.client||'', rr.product||'',
+        rr.source||'', rr.email||'', rr.mobile||'',
+        rr.stage||'', rr.reply||'', rr.remark||'', rr.type||''
+      ]);
+    });
+  });
+  const wsRR = XLSX.utils.aoa_to_sheet([rrRecordHeaders, ...rrRecordRows]);
+  wsRR['!cols'] = rrRecordHeaders.map(()=>({wch:18}));
+  rrRecordHeaders.forEach((_,c)=>{
+    const cell = XLSX.utils.encode_cell({r:0,c});
+    if(wsRR[cell]) wsRR[cell].s={fill:{fgColor:{rgb:'EDE9FF'}},font:{bold:true}};
+  });
+  XLSX.utils.book_append_sheet(wb, wsRR, '找人才紀錄');
 
   // ── Sheet 2：訪談人才（從最新訪談紀錄讀取，不用 talent 主資料快取）──
   const ivHeaders = ['受訪人','訪談HR','公司(訪談公司)','產業類型','年齡','專業工作年資','受訪人身份','受訪日期',
@@ -5077,20 +5111,22 @@ let _importType = 'recruit'; // 'recruit' | 'interview' | 'both'
 
 // 找人才：與新增人才「找人才」表單欄位完全一致
 const IMPORT_COLS_RECRUIT = [
-  { key:'name',        label:'姓名',          required:true  },
-  { key:'company',     label:'公司',           required:false },
-  { key:'jobGroup',    label:'Job Group',     required:false },
-  { key:'jobFamily',   label:'Job Family',    required:false },
-  { key:'jobFunction', label:'Job Function',  required:false },
-  { key:'level',       label:'層級',           required:false },
-  { key:'title',       label:'職稱',           required:false },
-  { key:'client',      label:'客戶/代工廠',     required:false },
-  { key:'product',     label:'產品',           required:false },
-  { key:'source',      label:'Source（來源/連結）', required:false },
-  { key:'email',       label:'電子郵件',        required:false },
-  { key:'mobile',      label:'手機號碼',        required:false },
-  { key:'linkedin',    label:'LinkedIn網址',   required:false },
-  { key:'remark',      label:'Remark（備註）',  required:false },
+  { key:'name',        label:'姓名',               required:true  },
+  { key:'company',     label:'公司',                required:true  },
+  { key:'hr',          label:'訪談 HR',             required:true  },
+  { key:'jobGroup',    label:'Job Group',          required:true  },
+  { key:'jobFamily',   label:'Job Family',         required:true  },
+  { key:'jobFunction', label:'Job Function',       required:true  },
+  { key:'level',       label:'層級',                required:true  },
+  { key:'title',       label:'職稱',                required:true  },
+  { key:'client',      label:'客戶/代工廠',          required:false },
+  { key:'product',     label:'產品',                required:false },
+  { key:'source',      label:'Source（來源/連結）',  required:true  },
+  { key:'email',       label:'電子郵件',             required:false },
+  { key:'mobile',      label:'手機號碼',             required:false },
+  { key:'stage',       label:'面試階段',             required:false },
+  { key:'reply',       label:'接觸進度',             required:true  },
+  { key:'remark',      label:'Remark（備註）',       required:true  },
 ];
 
 // 訪談人才：與新增人才「訪談人才」表單欄位完全一致
@@ -5234,8 +5270,9 @@ function downloadImportTemplate() {
     travelFreq:'每季', travelCountry:'中國/美國',
     push:'薪資/升遷', impression:'正面',
     keyman:'高級工程師/課專員', other:'補充說明', special:'市場動態',
-    source:'LinkedIn', email:'example@email.com',
-    mobile:'0912345678', linkedin:'https://linkedin.com/in/xxx', remark:'備註說明',
+    source:'https://linkedin.com/in/xxx', email:'example@email.com',
+    mobile:'0912345678', remark:'備註說明',
+    stage:'待面試', reply:'已接觸',
   };
 
   const getOpts = key => dropdownOptions[key] || (DEFAULT_OPTIONS[key] ? DEFAULT_OPTIONS[key].options : null);
@@ -5247,6 +5284,8 @@ function downloadImportTemplate() {
     complexity:  getOpts('iv-complexity'),
     mgmt:        getOpts('iv-mgmt'),
     keyman:      getOpts('iv-iec-grade'),
+    stage:       ['待面試','已面試','待複試','主管評估中','人選考慮中','婉拒口頭Offer','待報到','未錄取','未報到'],
+    reply:       ['已接觸','待聯繫','有轉職意願','無轉職意願'],
     jobGroup:    Object.keys(JOB_FAMILY_MAP),
     jobFamily:   Object.values(JOB_FAMILY_MAP).flat(),
     jobFunction: Object.values(JOB_FUNCTION_MAP).flat(),
@@ -5428,12 +5467,15 @@ async function confirmImport() {
         title:       isIv ? (row.jobtitle || row.title || '') : (row.title || ''),
         grade:       row.grade       || '',
         // recruit-specific
+        ivHr:        isRr ? (row.hr || '') : '',
         level:       row.level       || '',
         client:      isIv ? (row.brand || row.client || '') : (row.client || ''),
         product:     isIv ? (row.prodline || row.product || '') : (row.product || ''),
         source:      source,
         email:       row.email       || '',
         mobile:      row.mobile      || '',
+        status:      isRr ? (row.stage || '') : '',
+        reply:       isRr ? (row.reply || '') : '',
         remark:      row.remark      || '',
         // interview-specific
         hr:          row.hr          || '',
