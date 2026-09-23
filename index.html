@@ -2723,9 +2723,12 @@ function openTalentDetail(id){
   const isBase64 = url => url && url.startsWith('data:');
   const rrSection = isR ? `
     <div class="detail-section">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;flex-wrap:wrap">
         <div class="detail-section-title purple" style="margin-bottom:0">找人才紀錄（${rrList.length} 筆）</div>
-        <button class="btn btn-primary" style="font-size:11px;padding:5px 12px" onclick="toggleInlineRrForm(${id})">＋ 新增紀錄</button>
+        <div style="display:flex;gap:8px">
+          ${rrList.length ? `<button class="btn" style="font-size:11px;padding:5px 12px;background:var(--coral);color:#fff;border-color:var(--coral)" onclick="deleteAllRecruitRecords(${id})">🗑 全部刪除</button>` : ''}
+          <button class="btn btn-primary" style="font-size:11px;padding:5px 12px" onclick="toggleInlineRrForm(${id})">＋ 新增紀錄</button>
+        </div>
       </div>
       ${rrList.length ? rrList.map((rr,idx)=>`
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;position:relative;overflow:hidden">
@@ -2924,7 +2927,10 @@ function openTalentDetail(id){
 
   const ivSection = ivList.length ? `
     <div class="detail-section">
-      <div class="detail-section-title blue">訪談紀錄（${ivList.length} 筆）</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="detail-section-title blue" style="margin-bottom:0">訪談紀錄（${ivList.length} 筆）</div>
+        <button class="btn" style="font-size:11px;padding:5px 12px;background:var(--coral);color:#fff;border-color:var(--coral)" onclick="deleteAllInterviews(${t.id})">🗑 全部刪除</button>
+      </div>
       ${ivList.map((iv,idx)=>`
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;position:relative;overflow:hidden">
           <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue)"></div>
@@ -3014,8 +3020,8 @@ function openTalentDetail(id){
             ${t.types&&t.types.includes('recruit')&&t.status?`<span class="tag tag-${STATUS_COLORS[t.status]||'gray'}">${t.status}</span>`:''}
           </div>
         </div>
-        <!-- Actions -->
-        <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;align-items:stretch;min-width:110px">
+        <!-- Actions（先隱藏頂部的編輯/刪除，改用下方各紀錄區塊自己的編輯/刪除） -->
+        <div style="display:none;flex-direction:column;gap:8px;flex-shrink:0;align-items:stretch;min-width:110px">
           <button class="btn" style="font-size:12px;padding:7px 14px;justify-content:center" onclick="openEditTalent(${t.id})">✏️ 編輯資料</button>
           <button class="btn" style="font-size:12px;padding:7px 14px;justify-content:center;background:var(--coral);color:#fff;border-color:var(--coral);font-weight:500" onclick="deleteTalentConfirm(${t.id})">🗑 刪除</button>
         </div>
@@ -4087,6 +4093,34 @@ async function deleteRecruitRecord(talentId, idx, docId) {
   openTalentDetail(talentId);
 }
 
+async function deleteAllRecruitRecords(talentId) {
+  const list = recruitRecords[talentId] || [];
+  if (!list.length) return;
+  const t = talents.find(x => x.id === talentId);
+  if (!confirm(`確定要刪除「${t ? t.name : ''}」的全部 ${list.length} 筆找人才紀錄嗎？\n同時會移除「🔍 找人才」這個類型標籤（若他還有「💬 訪談」類型會保留）。\n此操作無法復原。`)) return;
+  showLoading('刪除中...');
+  try {
+    for (const rr of list.slice()) {
+      if (rr._docId) await fbDelete('recruitRecords', rr._docId);
+    }
+    recruitRecords[talentId] = [];
+    await syncSharedFieldsFromLatestRecord(talentId);
+    // 找人才紀錄都刪光了，順便把「找人才」這個類型標籤拿掉，避免他還留在 🔍找人才 分頁
+    if (t && t.types && t.types.includes('recruit')) {
+      const newTypes = t.types.filter(tp => tp !== 'recruit');
+      t.types = newTypes;
+      if (t._docId) await fbUpdate('talents', t._docId, { types: newTypes });
+    }
+    showToast('✓ 找人才紀錄已全部刪除');
+  } catch(e) {
+    console.error(e);
+    showToast('⚠ 刪除失敗', false);
+  }
+  hideLoading();
+  renderTalents();
+  openTalentDetail(talentId);
+}
+
 function resetRecruitRecordModal() {
   ['rr-date','rr-ivhr','rr-company','rr-jobgroup','rr-jobfamily','rr-jobfunction','rr-level','rr-jobtitle','rr-client',
    'rr-product','rr-source','rr-email','rr-mobile','rr-resume','rr-remark'].forEach(id=>{
@@ -4660,6 +4694,34 @@ async function deleteInterview(talentId, idx, docId) {
   openTalentDetail(talentId);
 }
 
+async function deleteAllInterviews(talentId) {
+  const list = interviews[talentId] || [];
+  if (!list.length) return;
+  const t = talents.find(x => x.id === talentId);
+  if (!confirm(`確定要刪除「${t ? t.name : ''}」的全部 ${list.length} 筆訪談紀錄嗎？\n同時會移除「💬 訪談」這個類型標籤（若他還有「🔍 找人才」類型會保留）。\n此操作無法復原。`)) return;
+  showLoading('刪除中...');
+  try {
+    for (const iv of list.slice()) {
+      if (iv._docId) await fbDelete('interviews', iv._docId);
+    }
+    interviews[talentId] = [];
+    await syncSharedFieldsFromLatestRecord(talentId);
+    // 訪談紀錄都刪光了，順便把「訪談」這個類型標籤拿掉，避免他還留在 💬訪談 分頁
+    if (t && t.types && t.types.includes('interview')) {
+      const newTypes = t.types.filter(tp => tp !== 'interview');
+      t.types = newTypes;
+      if (t._docId) await fbUpdate('talents', t._docId, { types: newTypes });
+    }
+    showToast('✓ 訪談紀錄已全部刪除');
+  } catch(e) {
+    console.error(e);
+    showToast('⚠ 刪除失敗', false);
+  }
+  hideLoading();
+  renderTalents();
+  openTalentDetail(talentId);
+}
+
 function resetInterviewModal() {
   document.querySelector('#modal-add-interview .modal-title').textContent = '新增訪談紀錄';
   document.querySelector('#modal-add-interview .modal-footer').innerHTML = `
@@ -4762,17 +4824,9 @@ async function updateTalentFromForm(id) {
   const t = talents.find(x => x.id === id);
   if (!t) return;
 
-  // Merge new type selections with existing types (don't remove types not shown in form)
-  const selectedTypes = Object.keys(typeState).filter(k => typeState[k]);
-  const existingTypes = t.types || [];
-  // Add selected types, keep any existing types that weren't deselected
-  const mergedTypes = [...new Set([...existingTypes, ...selectedTypes])];
-  // Remove types that were explicitly deselected
-  const types = mergedTypes.filter(tp => {
-    if(tp === 'recruit') return typeState.recruit;
-    if(tp === 'interview') return typeState.interview !== false || existingTypes.includes('interview');
-    return true;
-  });
+  // 依照編輯視窗裡「🔍 找人才」「💬 訪談」目前勾選的狀態決定 types，
+  // 這樣取消勾選其中一個類型時才會真的被移除（修正前訪談類型無法被移除的問題）
+  const types = ['recruit','interview'].filter(tp => typeState[tp]);
 
   const isRecruit = types.includes('recruit');
   const isInterview = types.includes('interview');
